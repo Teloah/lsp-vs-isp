@@ -1,6 +1,6 @@
 # LSP vs ISP
 
-Nick Hodges [is writing][coding in delphi group] a book "[More Coding in Delphi][more coding]" - a sequel to his excellent book "[Coding in Delphi][coding in delphi]". In a section about Interface Segregation Principle he uses essentially the same example as for Liskov Substitution Principle, only the names are changed. Here I'll try to show why I think that it is not a good idea and cannot explain the meaning of ISP to the readers. Worse, it can lead to an impression that both of these principles are very similar or even almost the same. If an example is the same and an outcome from applying the principles is the same, what's the difference, right? And, if one principle already fixes the problem, why bother to remember another one? I'll try to explain the difference and show what problems each of them is designed to prevent.
+Nick Hodges [is writing][coding in delphi group] a book "[More Coding in Delphi][more coding]" — a sequel to his excellent book "[Coding in Delphi][coding in delphi]". In a section about Interface Segregation Principle he uses essentially the same example as for Liskov Substitution Principle, only the names are changed. Here I'll try to show why I think that it is not a good idea and cannot explain the meaning of ISP to the readers. Worse, it can lead to an impression that both of these principles are very similar or even almost the same. If an example is the same and an outcome from applying the principles is the same, what's the difference, right? And, if one principle already fixes the problem, why bother to remember another one? I'll try to describe the difference, show what problems each of them is designed to prevent and take a closer look to the relation between LSP and ISP.
 
 ### The Liskov Substitution Principle
 
@@ -26,7 +26,7 @@ Here's a diagram for this code:
 
 ![Liskov Substitution Principle violation](http://yuml.me/c3310b60)
 
-The only thing that I would add to this example would be a client, cause raising an exception or doing nothing in `TPenguin.Fly` is not inherently wrong, it's bad only because it breaks its clients — objects who make calls to `IBird.Fly` and expect some outcome from this call.
+It would be good to add a client to this example, cause raising an exception or doing nothing in `TPenguin.Fly` is not inherently wrong, it violates LSP only **if** it breaks its clients — other objects who make calls to `IBird.Fly`.
 
 Uncle Bob in his article writes:
 >A model, viewed in isolation, can not be meaningfully validated. The validity of a model can only be expressed in terms of its clients.
@@ -49,19 +49,23 @@ Let's add one client for illustrative purposes:
 Nick mentions several indications of LSP violations but doesn't really mention consequences and explain **why** it's bad.
 
 ##### What LSP violations do
-They break polymorphism and force programmers to add checks and casts to specific subtypes, thus coupling other parts of the system to them and adding much bigger maintenance burden.
+They break polymorphism and force clients to add special handling for specific subtypes, thus coupling other parts of the system to them, making the system much more brittle and adding a lot to the maintenance burden.
 
-If `TPenguin.Fly` would raise an exception, `TBirdKeeper.FeedAndReleaseBirds` would be broken. 
+If `TPenguin.Fly` would raise an exception, every call to it, including our `TBirdKeeper.FeedAndReleaseBirds`, would be broken.
 
 ##### LSP fix
 
-Behaviorally `TPenguin` does not match `IBird` interface, so it cannot be in a "**is a**" relationship with `IBird`. To fix this, Nick divides `IBird` into 2 new interfaces: `IFlyable` and `IEater`. He also mentions that this solution uses the Interface Segregation Principle and I don't agree with that, but we'll talk about it later.
+Behaviorally `TPenguin` does not match `IBird` interface, so it cannot be in a "**is a**" relationship with `IBird`. To fix this, Nick divides `IBird` into 2 new interfaces: `IFlyable` and `IEater`. He also mentions that this solution uses the Interface Segregation Principle but I don't agree with that. It's true that ISP can be used to resolve LSP violations, but that's not the case in this example. But I'll talk more about it later.
 
 ![Liskov Substitution Principle fix](http://yuml.me/a84f2d45)
 
-Now a programmer has to update `TBirdKeeper` to use these 2 interfaces instead of `IBird`, but it still will be decoupled from concrete classes.
+Now a programmer has to update `TBirdKeeper` to use these 2 interfaces instead of `IBird`, but it still will be decoupled from concrete classes. Also I'd like to point out that it's not **required** to break up `IBird` interface. If it would be really important to keep existing `TBirdKeeper` intact (our implementation depends on `IBird.Fly`, so there's no way it would be able to use `TPenguin` anyway), the problem could be resolved in a different way:
 
-So, Nick's example is adequate for LSP. Unfortunately, he presents essentially the same example for ISP.
+![Liskov Substitution Principle alternate fix](http://yuml.me/f3650171)
+
+Any other clients, like `TFeeder` presented here, who were interested only in `IBird.Eat`, could now be updated to use `IEater.Eat` instead.
+
+So, Nick's example could be improved, but is adequate for LSP. Unfortunately, he presents essentially the same example for ISP.
 
 ### The Interface Segregation Principle
 
@@ -84,6 +88,8 @@ They indirectly couple otherwise completely independent classes, thus forcing re
 [Clean Code Episode 11, The Liskov Substitution Principle](https://cleancoders.com/episode/clean-code-episode-11-p1/show)
 
 [Clean Code Episode 12, The Interface Segregation Principle](https://cleancoders.com/episode/clean-code-episode-12/show)
+
+[Encapsulation and SOLID](http://www.pluralsight.com/courses/encapsulation-solid)
 
 [coding in delphi group]: https://plus.google.com/u/0/communities/110978417023349293804
 [more coding]: https://leanpub.com/morecodingindelphi
