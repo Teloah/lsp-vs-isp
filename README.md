@@ -2,8 +2,6 @@
 
 Nick Hodges [is writing][coding in delphi group] a book "[More Coding in Delphi][more coding]" - a sequel to his excellent book "[Coding in Delphi][coding in delphi]". In a section about Interface Segregation Principle he uses essentially the same example as for Liskov Substitution Principle, only the names are changed. Here I'll try to show why I think that it is not a good idea and cannot explain the meaning of ISP to the readers. Worse, it can lead to an impression that both of these principles are very similar or even almost the same. If an example is the same and an outcome from applying the principles is the same, what's the difference, right? And, if one principle already fixes the problem, why bother to remember another one? I'll try to explain the difference and show what problems each of them is designed to prevent.
 
-**Note**: Nick disabled access to the chapter about SOLID principles, and I don't remember them completely, so my examples may differ from his in some details.
-
 ### The Liskov Substitution Principle
 
 First, let's take a look at Liskov Substitution Principle and Nick's example for it.
@@ -24,42 +22,44 @@ Nick's example uses `IBird` interface and 2 implementing classes: `TCrow` and `T
     TCrow = class(TInterfacedObject, IBird);
     TPenguin = class(TInterfacedObject, IBird);
 
-Here's a UML diagram for this code:
+Here's a diagram for this code:
 
 ![Liskov Substitution Principle violation](http://yuml.me/c3310b60)
 
-Even though a real penguin **is a** bird, there's nothing meaningful a programmer can write in `TPenguin.Fly`. There are only 2 options: do nothing or raise an exception, for example `ENotSupportedException`. But what's wrong with that if no one is making a call to `TPenguin.Fly`? Uncle Bob in his article writes:
+The only thing that I would add to this example would be a client, cause raising an exception or doing nothing in `TPenguin.Fly` is not inherently wrong, it's bad only because it breaks its clients — objects who make calls to `IBird.Fly` and expect some outcome from this call.
+
+Uncle Bob in his article writes:
 >A model, viewed in isolation, can not be meaningfully validated. The validity of a model can only be expressed in terms of its clients.
 
-To really feel the pain from a LSP violation, we need at least one client making calls to `IBird` methods. Sadly, Nick's example does not show any (at least I don't remember), so let's invent one.
+Let's add one client for illustrative purposes:
 
-    procedure TBirdLauncher.LaunchBird;
+    procedure TBirdKeeper.FeedAndReleaseBirds;
     var
-      lBird : IBird;
+      Bird: IBird;
     begin
-      lBird := FBirdProvider.GetCurrentBird;
-      lBird.Fly;
+      for Bird in AvailableBirds do
+      begin
+        Bird.Eat;
+        Bird,Fly;
+      end;
     end;
 
-Now our model looks like this:
-![Liskov Subsitition Principle violation 2](http://yuml.me/61332511)
+![Liskov Substitution Principle example with a client](http://yuml.me/044ab873)
 
-`TBirdLauncher` does not know which implementation of `IBird` it will receive from `FBirdProvider`. It doesn't need to know and doesn't care as long as `lBird.Fly` behaves normally. But when a new version of `GetCurrentBird` starts to return instances of `TPenguin`, our `LaunchBird` blows up with a `ENotSupportedException`. What the programmer will do in this situation? He will add a check to prevent penguins from flying:
-
-    lBird := FBirdProvider.GetCurrentBird;
-    if not (lBird is TPenguin) then
-      lBird.Fly;
-
-If several classes make calls to `IBird.Fly`, this check (or at least `try..except` block) has to be added in each one of them. And it may not fix all problems if there are other parts of the system, which are expecting actions usually performed by `TCrow.Fly`. Those actions will not be performed and our system will be broken.
+Nick mentions several indications of LSP violations but doesn't really mention consequences and explain **why** it's bad.
 
 ##### What LSP violations do
-They break polymorphism and force programmers to add checks for specific subtypes, thus coupling other parts of the system to them.
+They break polymorphism and force programmers to add checks and casts to specific subtypes, thus coupling other parts of the system to them and adding much bigger maintenance burden.
+
+If `TPenguin.Fly` would raise an exception, `TBirdKeeper.FeedAndReleaseBirds` would be broken. 
 
 ##### LSP fix
 
-To fix this LSP violation we need to acknowledge that behaviorally `TPenguin` is not a `IBird`, so it cannot be in a "**is a**" relationship with `IBird`. 
+Behaviorally `TPenguin` does not match `IBird` interface, so it cannot be in a "**is a**" relationship with `IBird`. To fix this, Nick divides `IBird` into 2 new interfaces: `IFlyable` and `IEater`. He also mentions that this solution uses the Interface Segregation Principle and I don't agree with that, but we'll talk about it later.
 
-![Liskov Substitution Principle fix](http://yuml.me/814fb230)
+![Liskov Substitution Principle fix](http://yuml.me/a84f2d45)
+
+Now a programmer has to update `TBirdKeeper` to use these 2 interfaces instead of `IBird`, but it still will be decoupled from concrete classes.
 
 So, Nick's example is adequate for LSP. Unfortunately, he presents essentially the same example for ISP.
 
