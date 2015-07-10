@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{AD51CBC4-08C5-4742-B47D-ED96F833DA5A}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="DVDCore.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="DVDAdmin.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="DVDCore">
+        <MSBuild Projects="DVDCore.dproj"/>
+    </Target>
+    <Target Name="DVDCore:Clean">
+        <MSBuild Projects="DVDCore.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DVDCore:Make">
+        <MSBuild Projects="DVDCore.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="DVDAdmin">
+        <MSBuild Projects="DVDAdmin.dproj"/>
+    </Target>
+    <Target Name="DVDAdmin:Clean">
+        <MSBuild Projects="DVDAdmin.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DVDAdmin:Make">
+        <MSBuild Projects="DVDAdmin.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="DVDCore;DVDAdmin"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="DVDCore:Clean;DVDAdmin:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="DVDCore:Make;DVDAdmin:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
