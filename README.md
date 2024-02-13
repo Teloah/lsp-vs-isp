@@ -8,7 +8,7 @@ First, let's take a look at Liskov Substitution Principle and Nick's example for
 
 A definition of LSP from [Uncle Bob's article][uncle bob LSP]:
 
->FUNCTIONS THAT USE POINTERS OR REFERENCES TO BASE CLASSES MUST BE ABLE TO USE OBJECTS OF DERIVED CLASSES WITHOUT KNOWING IT.
+> FUNCTIONS THAT USE POINTERS OR REFERENCES TO BASE CLASSES MUST BE ABLE TO USE OBJECTS OF DERIVED CLASSES WITHOUT KNOWING IT.
 
 LSP deals with the situation when several classes are in the same class hierarchy or implement the same interface. They have an "**IS A**" relationship. It's all about polymorphism - all objects deriving from the same class or implementing the same interface should be substitutable for each other, so that the clients that use them through that base class or interface should not be concerned about the exact implementation.
 
@@ -28,10 +28,11 @@ Here's a diagram for this code:
 
 ![Liskov Substitution Principle violation](http://yuml.me/c3310b60)
 
-It would be good to add a client to this example, cause raising an exception or doing nothing in `TPenguin.Fly` is not inherently wrong, it violates LSP only **if** it breaks its clients — other objects who make calls to `IBird.Fly`.
+It would be good to add a client to this example, because raising an exception or doing nothing in `TPenguin.Fly` is not inherently wrong, it violates LSP only **if** it breaks its clients — other objects who make calls to `IBird.Fly`.
 
 Uncle Bob in his article writes:
->A model, viewed in isolation, can not be meaningfully validated. The validity of a model can only be expressed in terms of its clients.
+
+> A model, viewed in isolation, can not be meaningfully validated. The validity of a model can only be expressed in terms of its clients.
 
 Let's add one client for illustrative purposes:
 
@@ -42,7 +43,7 @@ Let's add one client for illustrative purposes:
       for Bird in AvailableBirds do
       begin
         Bird.Eat;
-        Bird,Fly;
+        Bird.Fly;
       end;
     end;
 
@@ -68,14 +69,14 @@ So, Nick's example could be improved by adding a client, but it adequately expla
 
 The definition and a longer explanation from [Uncle Bob's article on ISP][uncle bob ISP]:
 
->CLIENTS SHOULD NOT BE FORCED TO DEPEND UPON INTERFACES THAT THEY DO NOT USE.
+> CLIENTS SHOULD NOT BE FORCED TO DEPEND UPON INTERFACES THAT THEY DO NOT USE.
 
->When clients are forced to depend upon interfaces that they don’t use, then those clients
-are subject to changes to those interfaces. This results in an inadvertent coupling between
-all the clients. Said another way, when a client depends upon a class that contains interfaces
-that the client does not use, but that other clients do use, then that client will be
-affected by the changes that those other clients force upon the class. We would like to
-avoid such couplings where possible, and so we want to separate the interfaces where possible.
+> When clients are forced to depend upon interfaces that they don’t use, then those clients
+> are subject to changes to those interfaces. This results in an inadvertent coupling between
+> all the clients. Said another way, when a client depends upon a class that contains interfaces
+> that the client does not use, but that other clients do use, then that client will be
+> affected by the changes that those other clients force upon the class. We would like to
+> avoid such couplings where possible, and so we want to separate the interfaces where possible.
 
 ISP deals with the situation when several clients talk to the same class through a "fat", non-cohesive interface, but each one uses only a part of all methods available.
 
@@ -114,6 +115,6 @@ So I think that Nick needs to rewrite a big part of this section about ISP, caus
 [coding in delphi group]: https://plus.google.com/u/0/communities/110978417023349293804
 [more coding]: https://leanpub.com/morecodingindelphi
 [coding in delphi]: https://leanpub.com/codingindelphi
-[uncle bob LSP]: http://www.objectmentor.com/resources/articles/lsp.pdf
-[uncle bob ISP]: http://www.objectmentor.com/resources/articles/isp.pdf
+[uncle bob LSP]: https://web.archive.org/web/20150905081110/http://www.objectmentor.com/resources/articles/lsp.pdf
+[uncle bob ISP]: https://web.archive.org/web/20150905081110/http://www.objectmentor.com/resources/articles/isp.pdf
 [role interface]: http://martinfowler.com/bliki/RoleInterface.html
